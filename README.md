@@ -23,7 +23,7 @@
 ### 1. Install Dependencies
 
 ```bash
-cd CMO_Quiz
+cd C:/CMO_Quiz
 npm install
 ```
 
