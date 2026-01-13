@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Language } from '@/types';
 import { languageNames, getTranslation } from '@/data/translations';
 
@@ -134,11 +135,18 @@ export default function HomePage() {
 
                 {/* Logo/Header */}
                 <div className="mb-8">
-                    <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-ocean-400 to-ocean-600 flex items-center justify-center shadow-lg">
-                        <span className="text-4xl">🌊</span>
+                    <div className="mx-auto mb-4">
+                        <Image
+                            src="/logos/visit-olhao-01.png"
+                            alt="Visit Olhão"
+                            width={200}
+                            height={100}
+                            className="mx-auto"
+                            priority
+                        />
                     </div>
                     <h1 className="text-3xl sm:text-4xl font-bold gradient-text mb-2">
-                        Quiz Olhão
+                        Quiz do Município de Olhão
                     </h1>
                     <p className="text-ocean-600 font-medium">FITUR 2026</p>
                 </div>
@@ -167,7 +175,7 @@ export default function HomePage() {
                 {/* Footer */}
                 <div className="pt-6 border-t border-ocean-200">
                     <p className="text-ocean-400 text-xs">
-                        Câmara Municipal de Olhão © 2026
+                        Município de Olhão © 2026
                     </p>
                 </div>
             </div>

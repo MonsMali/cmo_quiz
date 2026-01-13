@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Language } from '@/types';
 import { getTranslation } from '@/data/translations';
 import Confetti from './Confetti';
@@ -82,9 +83,15 @@ export default function ResultScreen({
                     {getTranslation('visitOlhao', language)}
                 </p>
 
-                {/* Decorative wave */}
-                <div className="mt-8 text-6xl opacity-20">
-                    🌊
+                {/* Visit Olhão logo */}
+                <div className="mt-8">
+                    <Image
+                        src="/logos/visit-olhao-03.png"
+                        alt="Visit Olhão"
+                        width={150}
+                        height={75}
+                        className="mx-auto"
+                    />
                 </div>
             </div>
         </>
