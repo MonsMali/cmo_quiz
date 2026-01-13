@@ -9,8 +9,12 @@ import ProgressIndicator from '@/components/ProgressIndicator';
 import QuizQuestion from '@/components/QuizQuestion';
 import UserForm from '@/components/UserForm';
 import ResultScreen from '@/components/ResultScreen';
+import Timer from '@/components/Timer';
+import AnswerReview from '@/components/AnswerReview';
 
-type QuizState = 'loading' | 'quiz' | 'form' | 'submitting' | 'result' | 'error';
+type QuizState = 'loading' | 'quiz' | 'transitioning' | 'form' | 'submitting' | 'result' | 'error';
+
+const QUESTION_TIME_LIMIT = 30; // seconds per question
 
 interface Result {
     correctAnswers: number;
@@ -28,6 +32,9 @@ export default function QuizPage() {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
     const [result, setResult] = useState<Result | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [timerKey, setTimerKey] = useState(0); // Used to reset timer
+    const [isAnimating, setIsAnimating] = useState(false);
+    const [showReview, setShowReview] = useState(false);
 
     // Load language from localStorage and fetch quiz
     useEffect(() => {
@@ -48,6 +55,7 @@ export default function QuizPage() {
             const data = await response.json();
             setQuiz(data.quiz);
             setState('quiz');
+            setTimerKey((prev) => prev + 1); // Start timer
         } catch (err) {
             console.error('Error fetching quiz:', err);
             setError(getTranslation('errorOccurred', language));
@@ -59,22 +67,45 @@ export default function QuizPage() {
         setSelectedIndex(index);
     }, []);
 
+    const handleTimeUp = useCallback(() => {
+        // If no answer selected when time runs out, select first option (or skip)
+        if (selectedIndex === null && quiz) {
+            // Auto-select a random wrong answer or first option
+            setSelectedIndex(0);
+        }
+        // Auto-advance to next question
+        setTimeout(() => {
+            handleNext();
+        }, 500);
+    }, [selectedIndex, quiz]);
+
     const handleNext = useCallback(() => {
-        if (selectedIndex === null || !quiz) return;
+        if (!quiz) return;
+
+        // Use current selected index or 0 if time ran out
+        const answerIndex = selectedIndex ?? 0;
 
         const currentQuestion = quiz.questions[currentQuestionIndex];
         const newAnswer = {
             questionId: currentQuestion.id,
-            selectedIndex: selectedIndex,
+            selectedIndex: answerIndex,
         };
 
         const newAnswers = [...answers, newAnswer];
         setAnswers(newAnswers);
 
         if (currentQuestionIndex < quiz.questions.length - 1) {
-            // Move to next question
-            setCurrentQuestionIndex((prev) => prev + 1);
-            setSelectedIndex(null);
+            // Animate transition
+            setIsAnimating(true);
+            setState('transitioning');
+
+            setTimeout(() => {
+                setCurrentQuestionIndex((prev) => prev + 1);
+                setSelectedIndex(null);
+                setTimerKey((prev) => prev + 1); // Reset timer for next question
+                setIsAnimating(false);
+                setState('quiz');
+            }, 300);
         } else {
             // All questions answered, show form
             setState('form');
@@ -132,7 +163,21 @@ export default function QuizPage() {
         setCurrentQuestionIndex(0);
         setSelectedIndex(null);
         setResult(null);
+        setShowReview(false);
         fetchQuiz();
+    };
+
+    const toggleReview = () => {
+        setShowReview((prev) => !prev);
+    };
+
+    // Review button labels
+    const reviewLabels: Record<Language, { show: string; hide: string }> = {
+        pt: { show: 'Ver respostas', hide: 'Ocultar respostas' },
+        es: { show: 'Ver respuestas', hide: 'Ocultar respuestas' },
+        fr: { show: 'Voir les réponses', hide: 'Masquer les réponses' },
+        de: { show: 'Antworten anzeigen', hide: 'Antworten ausblenden' },
+        en: { show: 'View answers', hide: 'Hide answers' },
     };
 
     // Render based on state
@@ -147,25 +192,40 @@ export default function QuizPage() {
                 )}
 
                 {/* Quiz state */}
-                {state === 'quiz' && quiz && (
+                {(state === 'quiz' || state === 'transitioning') && quiz && (
                     <>
-                        <ProgressIndicator
-                            current={currentQuestionIndex + 1}
-                            total={quiz.questions.length}
-                            language={language}
-                        />
+                        {/* Header with progress and timer */}
+                        <div className="flex items-center justify-between mb-4">
+                            <ProgressIndicator
+                                current={currentQuestionIndex + 1}
+                                total={quiz.questions.length}
+                                language={language}
+                            />
+                            <Timer
+                                duration={QUESTION_TIME_LIMIT}
+                                onTimeUp={handleTimeUp}
+                                isActive={state === 'quiz'}
+                                resetKey={timerKey}
+                            />
+                        </div>
 
-                        <QuizQuestion
-                            question={quiz.questions[currentQuestionIndex]}
-                            language={language}
-                            selectedIndex={selectedIndex}
-                            onAnswer={handleAnswer}
-                        />
+                        {/* Question with animation */}
+                        <div
+                            key={currentQuestionIndex}
+                            className={isAnimating ? 'slide-out-left' : 'slide-in-right'}
+                        >
+                            <QuizQuestion
+                                question={quiz.questions[currentQuestionIndex]}
+                                language={language}
+                                selectedIndex={selectedIndex}
+                                onAnswer={handleAnswer}
+                            />
+                        </div>
 
                         {/* Next button */}
                         <button
                             onClick={handleNext}
-                            disabled={selectedIndex === null}
+                            disabled={selectedIndex === null || state === 'transitioning'}
                             className="btn-primary w-full mt-6"
                         >
                             {currentQuestionIndex < quiz.questions.length - 1
@@ -192,14 +252,37 @@ export default function QuizPage() {
                 )}
 
                 {/* Result state */}
-                {state === 'result' && result && (
-                    <ResultScreen
-                        language={language}
-                        correctAnswers={result.correctAnswers}
-                        totalQuestions={4}
-                        prizeName={result.prizeName}
-                        prizeTier={result.prizeTier}
-                    />
+                {state === 'result' && result && quiz && (
+                    <>
+                        <ResultScreen
+                            language={language}
+                            correctAnswers={result.correctAnswers}
+                            totalQuestions={quiz.questions.length}
+                            prizeName={result.prizeName}
+                            prizeTier={result.prizeTier}
+                        />
+
+                        {/* Toggle answer review button */}
+                        <div className="mt-4 text-center">
+                            <button
+                                onClick={toggleReview}
+                                className="text-ocean-500 hover:text-ocean-600 text-sm font-medium underline underline-offset-4"
+                            >
+                                {showReview ? reviewLabels[language].hide : reviewLabels[language].show}
+                            </button>
+                        </div>
+
+                        {/* Answer review section */}
+                        {showReview && (
+                            <div className="mt-4 slide-up">
+                                <AnswerReview
+                                    questions={quiz.questions}
+                                    userAnswers={answers}
+                                    language={language}
+                                />
+                            </div>
+                        )}
+                    </>
                 )}
 
                 {/* Error state */}

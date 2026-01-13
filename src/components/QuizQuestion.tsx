@@ -19,7 +19,7 @@ export default function QuizQuestion({
     const options = question.options[language] || question.options.en;
 
     return (
-        <div className="slide-up">
+        <div>
             {/* Question text */}
             <h2 className="text-xl sm:text-2xl font-bold text-ocean-800 mb-6 leading-relaxed">
                 {questionText}

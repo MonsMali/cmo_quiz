@@ -177,6 +177,74 @@ body {
   }
 }
 
+/* Question slide animations */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.4s ease-out forwards;
+}
+
+.slide-out-left {
+  animation: slideOutLeft 0.3s ease-in forwards;
+}
+
+/* Timer styles */
+.timer-ring {
+  transition: stroke-dashoffset 1s linear;
+}
+
+.timer-warning {
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Answer review styles */
+.answer-correct {
+  @apply border-green-500 bg-green-50;
+}
+
+.answer-incorrect {
+  @apply border-coral-500 bg-red-50;
+}
+
+.answer-correct-indicator {
+  @apply bg-green-500 text-white;
+}
+
+.answer-incorrect-indicator {
+  @apply bg-coral-500 text-white;
+}
+
 /* Prize celebration */
 @keyframes celebrate {
 

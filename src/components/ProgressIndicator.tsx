@@ -25,7 +25,7 @@ export default function ProgressIndicator({
     const label = labels[language] || labels.en;
 
     return (
-        <div className="w-full mb-6">
+        <div className="flex-1">
             <div className="flex justify-between items-center mb-2">
                 <span className="text-ocean-600 font-medium text-sm">
                     {label.question} {current} {label.of} {total}
