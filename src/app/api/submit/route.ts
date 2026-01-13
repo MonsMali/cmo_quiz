@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase';
 import { Language, UserAnswer } from '@/types';
 import { getQuizById } from '@/data/quizzes';
 import { calculateCorrectAnswers, isAnswerCorrect } from '@/lib/quizLogic';
 import { processPrizeAssignment } from '@/lib/prizeLogic';
 import { nationalityFromLanguage } from '@/data/translations';
+import { isGoogleSheetsConfigured, checkEmailExists, addSubmission } from '@/lib/googleSheets';
 
 interface SubmitRequestBody {
     name: string;
@@ -85,13 +85,10 @@ export async function POST(request: NextRequest) {
         // Infer nationality from language
         const nationalityInferred = nationalityFromLanguage[language] || 'Unknown';
 
-        // Check for Supabase configuration
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-        if (!supabaseUrl || !serviceRoleKey || supabaseUrl === 'your_supabase_project_url') {
+        // Check if Google Sheets is configured
+        if (!isGoogleSheetsConfigured()) {
             // Development mode - return success without database
-            console.log('Supabase not configured - running in demo mode');
+            console.log('Google Sheets not configured - running in demo mode');
             return NextResponse.json({
                 success: true,
                 correctAnswers,
@@ -103,30 +100,16 @@ export async function POST(request: NextRequest) {
         }
 
         // Check for duplicate email
-        const supabase = createServerClient();
-
-        if (!supabase) {
-            return NextResponse.json(
-                { error: 'Database not configured', code: 'DATABASE_ERROR' },
-                { status: 500 }
-            );
-        }
-
-        const { data: existingSubmission } = await supabase
-            .from('submissions')
-            .select('id')
-            .eq('email', email.toLowerCase().trim())
-            .single();
-
-        if (existingSubmission) {
+        const emailExists = await checkEmailExists(email.toLowerCase().trim());
+        if (emailExists) {
             return NextResponse.json(
                 { error: 'Email already participated', code: 'DUPLICATE_EMAIL' },
                 { status: 409 }
             );
         }
 
-        // Save submission to database
-        const { error: insertError } = await supabase.from('submissions').insert({
+        // Save submission to Google Sheets
+        const result = await addSubmission({
             name: name.trim(),
             email: email.toLowerCase().trim(),
             quiz_id: quizId,
@@ -141,8 +124,14 @@ export async function POST(request: NextRequest) {
             marketing_consent: marketingConsent,
         });
 
-        if (insertError) {
-            console.error('Database insert error:', insertError);
+        if (!result.success) {
+            if (result.code === 'DUPLICATE_EMAIL') {
+                return NextResponse.json(
+                    { error: 'Email already participated', code: 'DUPLICATE_EMAIL' },
+                    { status: 409 }
+                );
+            }
+            console.error('Google Sheets insert error:', result.error);
             return NextResponse.json(
                 { error: 'Failed to save submission', code: 'DATABASE_ERROR' },
                 { status: 500 }

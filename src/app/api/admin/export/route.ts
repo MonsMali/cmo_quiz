@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { createServerClient } from '@/lib/supabase';
+import { isGoogleSheetsConfigured, getSubmissions } from '@/lib/googleSheets';
 
 // Verify admin session
 async function isAuthenticated(): Promise<boolean> {
@@ -22,9 +22,8 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Check Supabase configuration
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        if (!supabaseUrl || supabaseUrl === 'your_supabase_project_url') {
+        // Check Google Sheets configuration
+        if (!isGoogleSheetsConfigured()) {
             // Demo mode - return sample CSV
             const csvContent = 'id,name,email,quiz_id,correct_answers,prize_tier,prize_id,prize_awarded,language,nationality_inferred,timestamp,ip_address,marketing_consent\n' +
                 'demo-1,Demo User,demo@example.com,1,3,3,5,Prize 5,en,Other / English-speaking (inferred),2026-01-12T22:00:00Z,127.0.0.1,true';
@@ -37,28 +36,17 @@ export async function GET(request: NextRequest) {
             });
         }
 
-        const supabase = createServerClient();
+        // Fetch all submissions from Google Sheets
+        const result = await getSubmissions();
 
-        if (!supabase) {
-            return NextResponse.json(
-                { error: 'Database not configured' },
-                { status: 500 }
-            );
-        }
-
-        // Fetch all submissions
-        const { data: submissions, error } = await supabase
-            .from('submissions')
-            .select('*')
-            .order('timestamp', { ascending: false });
-
-        if (error) {
-            console.error('Database query error:', error);
+        if (!result) {
             return NextResponse.json(
                 { error: 'Failed to fetch submissions' },
                 { status: 500 }
             );
         }
+
+        const submissions = result.submissions;
 
         // Convert to CSV
         const headers = [
@@ -81,7 +69,7 @@ export async function GET(request: NextRequest) {
 
         submissions?.forEach((s) => {
             const row = headers.map((header) => {
-                const value = s[header];
+                const value = s[header as keyof typeof s];
                 // Escape quotes and wrap in quotes if contains comma
                 if (value === null || value === undefined) return '';
                 const stringValue = String(value);
