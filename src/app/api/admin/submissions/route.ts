@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
                         nationality_inferred: 'Other / English-speaking (inferred)',
                         timestamp: new Date().toISOString(),
                         ip_address: '127.0.0.1',
-                        marketing_consent: true,
+                        gdpr_accepted: true,
                     },
                 ],
                 stats: {

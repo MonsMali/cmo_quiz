@@ -12,13 +12,13 @@ interface SubmitRequestBody {
     quizId: number;
     answers: { questionId: string; selectedIndex: number }[];
     language: Language;
-    marketingConsent: boolean;
+    gdprAccepted: boolean;
 }
 
 export async function POST(request: NextRequest) {
     try {
         const body: SubmitRequestBody = await request.json();
-        const { name, email, quizId, answers, language, marketingConsent } = body;
+        const { name, email, quizId, answers, language, gdprAccepted } = body;
 
         // Validate required fields
         if (!name || !name.trim()) {
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
             language,
             ip_address: ipAddress,
             nationality_inferred: nationalityInferred,
-            marketing_consent: marketingConsent,
+            gdpr_accepted: gdprAccepted,
         });
 
         if (!result.success) {

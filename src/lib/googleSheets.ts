@@ -12,12 +12,12 @@ export interface SheetSubmission {
     quiz_id: number;
     correct_answers: number;
     prize_tier: number;
-    prize_id: number;
+    prize_id: number | null;
     prize_awarded: string | null;
     language: string;
     nationality_inferred: string;
     ip_address: string;
-    marketing_consent: boolean;
+    gdpr_accepted: boolean;
     questions_answered: Array<{
         questionId: string;
         selectedIndex: number;

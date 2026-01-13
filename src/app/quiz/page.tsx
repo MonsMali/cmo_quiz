@@ -84,7 +84,7 @@ export default function QuizPage() {
     const handleFormSubmit = async (formData: {
         name: string;
         email: string;
-        marketingConsent: boolean;
+        gdprAccepted: boolean;
     }) => {
         if (!quiz) return;
 

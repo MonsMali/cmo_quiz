@@ -11,7 +11,6 @@ type TranslationKey =
     | 'yourDetails'
     | 'fullName'
     | 'email'
-    | 'marketingConsent'
     | 'submitForm'
     | 'loading'
     | 'results'
@@ -111,13 +110,6 @@ export const translations: Record<TranslationKey, Record<Language, string>> = {
         fr: 'E-mail',
         de: 'E-Mail',
         en: 'Email',
-    },
-    marketingConsent: {
-        pt: 'Aceito receber informações turísticas da Câmara Municipal de Olhão',
-        es: 'Acepto recibir información turística del Ayuntamiento de Olhão',
-        fr: 'J\'accepte de recevoir des informations touristiques de la Mairie d\'Olhão',
-        de: 'Ich möchte touristische Informationen von der Stadtverwaltung Olhão erhalten',
-        en: 'I consent to receive tourism information from Olhão City Council',
     },
     submitForm: {
         pt: 'Enviar e ver resultado',

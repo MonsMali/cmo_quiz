@@ -6,15 +6,26 @@ import { getTranslation } from '@/data/translations';
 
 interface UserFormProps {
     language: Language;
-    onSubmit: (data: { name: string; email: string; marketingConsent: boolean }) => void;
+    onSubmit: (data: { name: string; email: string; gdprAccepted: boolean }) => void;
     isLoading: boolean;
 }
+
+const GDPR_TEXT = `O Município de Olhão informa que os dados solicitados, serão tratados de acordo com a nossa Politica de Privacidade, disponível no site https://cm-olhao.pt/menu/1676/politica-de-privacidade. Significando isto, que recolhemos os seus dados pessoais, unicamente, para a finalidade aqui determinada: Participação em atividade promocional/ Concurso e, que os mesmos serão destruídos após a conclusão do evento, considerando a atribuição de prémio e prazos de reclamação, legalmente previstos. O fundamento para o tratamento das informações prestadas é o plasmado na alínea b)., do nr. 1 do artigo 6º do Regulamento Geral de Proteção de Dados (RGPD). No entanto, se nos autorizar, assinalando essa vontade, enviaremos por email informações sobre outros eventos a decorrer no Concelho de Olhão e nos quais gostaríamos de contar com a sua presença. Caso pretenda pode a qualquer momento, aceder, alterar corrigir ou apagar os seus dados pessoais, através do email epd@cm-olhao.pt .`;
+
+// GDPR error messages by language
+const gdprErrorMessages: Record<Language, string> = {
+    pt: 'Deve aceitar a política de privacidade para continuar',
+    es: 'Debe aceptar la política de privacidad para continuar',
+    fr: 'Vous devez accepter la politique de confidentialité pour continuer',
+    de: 'Sie müssen die Datenschutzrichtlinie akzeptieren, um fortzufahren',
+    en: 'You must accept the privacy policy to continue',
+};
 
 export default function UserForm({ language, onSubmit, isLoading }: UserFormProps) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [marketingConsent, setMarketingConsent] = useState(false);
-    const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
+    const [gdprAccepted, setGdprAccepted] = useState(false);
+    const [errors, setErrors] = useState<{ name?: string; email?: string; gdpr?: string }>({});
 
     const validateEmail = (email: string): boolean => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,7 +35,7 @@ export default function UserForm({ language, onSubmit, isLoading }: UserFormProp
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const newErrors: { name?: string; email?: string } = {};
+        const newErrors: { name?: string; email?: string; gdpr?: string } = {};
 
         if (!name.trim()) {
             newErrors.name = getTranslation('nameRequired', language);
@@ -36,13 +47,17 @@ export default function UserForm({ language, onSubmit, isLoading }: UserFormProp
             newErrors.email = getTranslation('emailInvalid', language);
         }
 
+        if (!gdprAccepted) {
+            newErrors.gdpr = gdprErrorMessages[language];
+        }
+
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             return;
         }
 
         setErrors({});
-        onSubmit({ name: name.trim(), email: email.trim(), marketingConsent });
+        onSubmit({ name: name.trim(), email: email.trim(), gdprAccepted });
     };
 
     return (
@@ -104,22 +119,30 @@ export default function UserForm({ language, onSubmit, isLoading }: UserFormProp
                     )}
                 </div>
 
-                {/* Marketing consent checkbox */}
-                <div className="flex items-start gap-3 py-2">
-                    <input
-                        type="checkbox"
-                        id="marketingConsent"
-                        checked={marketingConsent}
-                        onChange={(e) => setMarketingConsent(e.target.checked)}
-                        className="mt-1 w-5 h-5 text-ocean-500 border-ocean-300 rounded focus:ring-ocean-400"
-                        disabled={isLoading}
-                    />
-                    <label
-                        htmlFor="marketingConsent"
-                        className="text-sm text-ocean-600 leading-relaxed cursor-pointer"
-                    >
-                        {getTranslation('marketingConsent', language)}
-                    </label>
+                {/* GDPR consent checkbox - Required */}
+                <div className={`p-4 rounded-lg border ${errors.gdpr ? 'border-coral-400 bg-coral-50' : 'border-ocean-200 bg-ocean-50'}`}>
+                    <div className="flex items-start gap-3">
+                        <input
+                            type="checkbox"
+                            id="gdprAccepted"
+                            checked={gdprAccepted}
+                            onChange={(e) => {
+                                setGdprAccepted(e.target.checked);
+                                if (errors.gdpr) setErrors((prev) => ({ ...prev, gdpr: undefined }));
+                            }}
+                            className="mt-1 w-5 h-5 text-ocean-500 border-ocean-300 rounded focus:ring-ocean-400 flex-shrink-0"
+                            disabled={isLoading}
+                        />
+                        <label
+                            htmlFor="gdprAccepted"
+                            className="text-xs text-ocean-700 leading-relaxed cursor-pointer"
+                        >
+                            {GDPR_TEXT} *
+                        </label>
+                    </div>
+                    {errors.gdpr && (
+                        <p className="mt-2 text-sm text-coral-500 font-medium">{errors.gdpr}</p>
+                    )}
                 </div>
 
                 {/* Submit button */}

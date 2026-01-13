@@ -7,7 +7,7 @@
  * 3. Add these headers in row 1:
  *    A: timestamp, B: name, C: email, D: quiz_id, E: correct_answers,
  *    F: prize_tier, G: prize_id, H: prize_awarded, I: language,
- *    J: nationality_inferred, K: ip_address, L: marketing_consent, M: questions_answered
+ *    J: nationality_inferred, K: ip_address, L: gdpr_accepted, M: questions_answered
  *
  * 4. Go to Extensions > Apps Script
  * 5. Delete any code in Code.gs and paste this entire file
@@ -103,7 +103,7 @@ function doPost(e) {
       data.language || 'en',
       data.nationality_inferred || '',
       data.ip_address || '',
-      data.marketing_consent || false,
+      data.gdpr_accepted || false,
       JSON.stringify(data.questions_answered || [])
     ];
 
@@ -158,7 +158,7 @@ function getAllSubmissions(sheet, filters) {
       language: row[8],
       nationality_inferred: row[9],
       ip_address: row[10],
-      marketing_consent: row[11],
+      gdpr_accepted: row[11],
       questions_answered: row[12] ? JSON.parse(row[12]) : []
     };
 
@@ -240,7 +240,7 @@ function testSetup() {
   const expectedHeaders = [
     'timestamp', 'name', 'email', 'quiz_id', 'correct_answers',
     'prize_tier', 'prize_id', 'prize_awarded', 'language',
-    'nationality_inferred', 'ip_address', 'marketing_consent', 'questions_answered'
+    'nationality_inferred', 'ip_address', 'gdpr_accepted', 'questions_answered'
   ];
 
   console.log('Current headers:', headers);

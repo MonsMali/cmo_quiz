@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
         // Check Google Sheets configuration
         if (!isGoogleSheetsConfigured()) {
             // Demo mode - return sample CSV
-            const csvContent = 'id,name,email,quiz_id,correct_answers,prize_tier,prize_id,prize_awarded,language,nationality_inferred,timestamp,ip_address,marketing_consent\n' +
+            const csvContent = 'id,name,email,quiz_id,correct_answers,prize_tier,prize_id,prize_awarded,language,nationality_inferred,timestamp,ip_address,gdpr_accepted\n' +
                 'demo-1,Demo User,demo@example.com,1,3,3,5,Prize 5,en,Other / English-speaking (inferred),2026-01-12T22:00:00Z,127.0.0.1,true';
 
             return new NextResponse(csvContent, {
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
             'nationality_inferred',
             'timestamp',
             'ip_address',
-            'marketing_consent',
+            'gdpr_accepted',
         ];
 
         const csvRows = [headers.join(',')];
