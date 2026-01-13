@@ -6,7 +6,11 @@ export const metadata: Metadata = {
     title: 'Quiz Olhão - FITUR 2026',
     description: 'Participe no Quiz Olhão e ganhe prémios! Teste os seus conhecimentos sobre Olhão, a Ria Formosa e o Algarve.',
     keywords: ['Olhão', 'Quiz', 'FITUR', 'Algarve', 'Ria Formosa', 'Portugal', 'Tourism'],
-    authors: [{ name: 'Câmara Municipal de Olhão' }],
+    authors: [{ name: 'Município de Olhão' }],
+    icons: {
+        icon: '/favicon.png',
+        apple: '/apple-touch-icon.png',
+    },
     openGraph: {
         title: 'Quiz Olhão - FITUR 2026',
         description: 'Teste os seus conhecimentos sobre Olhão e ganhe prémios!',
@@ -31,7 +35,7 @@ export default function RootLayout({
     return (
         <html lang="pt">
             <head>
-                <link rel="icon" href="/favicon.ico" sizes="any" />
+                <link rel="icon" type="image/png" href="/favicon.png" />
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="default" />
