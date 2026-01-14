@@ -84,7 +84,11 @@ export default function QuizPage() {
         };
 
         const newAnswers = [...answers, newAnswer];
+
+        // Update answers state first
         setAnswers(newAnswers);
+
+        console.log('handleNext called, currentQuestionIndex:', currentQuestionIndex, 'Total answers after this:', newAnswers.length);
 
         if (currentQuestionIndex < quiz.questions.length - 1) {
             // Animate transition
@@ -100,8 +104,11 @@ export default function QuizPage() {
                 setState('quiz');
             }, 300);
         } else {
-            // All questions answered, show form
-            setState('form');
+            // All questions answered, wait a tick for state to update before showing form
+            console.log('Last question answered, showing form after state update');
+            setTimeout(() => {
+                setState('form');
+            }, 50); // Small delay to ensure state has updated
         }
     }, [selectedIndex, quiz, currentQuestionIndex, answers]);
 
@@ -134,6 +141,17 @@ export default function QuizPage() {
         gdprAccepted: boolean;
     }) => {
         if (!quiz) return;
+
+        // Debug: Check how many answers we have before submitting
+        console.log('Submitting with answers:', answers);
+        console.log('Number of answers:', answers.length);
+
+        if (answers.length !== 4) {
+            console.error('ERROR: Expected 4 answers but have', answers.length);
+            setError(`Internal error: Only ${answers.length} answers recorded. Please try again.`);
+            setState('error');
+            return;
+        }
 
         setState('submitting');
 
@@ -218,7 +236,7 @@ export default function QuizPage() {
                         {/* Header with progress and timer */}
                         <div className="flex items-center justify-between mb-4">
                             <ProgressIndicator
-                                current={answers.length}
+                                current={currentQuestionIndex + 1}
                                 total={quiz.questions.length}
                                 language={language}
                             />
