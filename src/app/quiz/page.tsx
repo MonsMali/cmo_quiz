@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Language, Quiz, UserAnswer } from '@/types';
 import { getTranslation } from '@/data/translations';
@@ -36,6 +36,7 @@ export default function QuizPage() {
     const [isAnimating, setIsAnimating] = useState(false);
     const [showReview, setShowReview] = useState(false);
     const [showFeedback, setShowFeedback] = useState(false);
+    const processingRef = useRef(false); // Prevent duplicate handleNext calls
 
     // Load language from localStorage and fetch quiz
     useEffect(() => {
@@ -65,14 +66,16 @@ export default function QuizPage() {
     };
 
     const handleAnswer = useCallback((index: number) => {
-        if (showFeedback) return; // Prevent changing answer during feedback
+        if (showFeedback || state !== 'quiz' || processingRef.current) return; // Prevent changing answer during feedback or wrong state
 
         setSelectedIndex(index);
         setShowFeedback(true);
-    }, [showFeedback]);
+    }, [showFeedback, state]);
 
     const handleNext = useCallback(() => {
-        if (!quiz) return;
+        if (!quiz || processingRef.current) return; // Prevent duplicate calls
+
+        processingRef.current = true; // Mark as processing
 
         // Use current selected index or 0 if time ran out
         const answerIndex = selectedIndex ?? 0;
@@ -102,26 +105,28 @@ export default function QuizPage() {
                 setTimerKey((prev) => prev + 1); // Reset timer for next question
                 setIsAnimating(false);
                 setState('quiz');
+                processingRef.current = false; // Reset processing flag for next question
             }, 300);
         } else {
             // All questions answered, wait a tick for state to update before showing form
             console.log('Last question answered, showing form after state update');
             setTimeout(() => {
                 setState('form');
+                processingRef.current = false; // Reset processing flag
             }, 50); // Small delay to ensure state has updated
         }
     }, [selectedIndex, quiz, currentQuestionIndex, answers]);
 
     // Auto-advance after showing feedback
     useEffect(() => {
-        if (showFeedback && selectedIndex !== null) {
+        if (showFeedback && selectedIndex !== null && state === 'quiz' && !processingRef.current) {
             const timer = setTimeout(() => {
                 handleNext();
             }, 1500);
 
             return () => clearTimeout(timer);
         }
-    }, [showFeedback, selectedIndex, handleNext]);
+    }, [showFeedback, selectedIndex, state]); // Remove handleNext from dependencies to prevent infinite loop
 
     const handleTimeUp = useCallback(() => {
         // If no answer selected when time runs out, select first option (or skip)
@@ -203,6 +208,7 @@ export default function QuizPage() {
         setResult(null);
         setShowReview(false);
         setShowFeedback(false);
+        processingRef.current = false; // Reset processing flag
         fetchQuiz();
     };
 
