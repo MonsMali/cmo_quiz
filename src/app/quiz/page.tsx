@@ -157,7 +157,11 @@ export default function QuizPage() {
                     setState('error');
                     return;
                 }
-                throw new Error(data.error || 'Submission failed');
+                // Set error and stay on error page (don't throw)
+                console.error('Submission error:', data.error, data.code);
+                setError(data.error || getTranslation('errorOccurred', language));
+                setState('error');
+                return;
             }
 
             setResult({

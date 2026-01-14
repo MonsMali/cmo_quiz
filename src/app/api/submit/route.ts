@@ -62,11 +62,14 @@ export async function POST(request: NextRequest) {
         // Block test@ and @test.com EXCEPT test[number]@test.com pattern (for testing)
         if ((/^test@/.test(trimmedEmail) || /@test\.com$/.test(trimmedEmail)) &&
             !/^test\d+@test\.com$/.test(trimmedEmail)) {
+            console.log('Email rejected by test pattern check:', trimmedEmail);
             return NextResponse.json(
                 { error: 'Please use a valid email address', code: 'EMAIL_INVALID' },
                 { status: 400 }
             );
         }
+
+        console.log('Email passed validation:', trimmedEmail);
 
         // Validate answers
         if (!answers || answers.length !== 4) {
