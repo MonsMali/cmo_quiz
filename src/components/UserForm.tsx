@@ -43,11 +43,16 @@ export default function UserForm({ language, onSubmit, isLoading }: UserFormProp
             '@gmailcom', '@gmai.com', '@gmial.com', '@gmaill.com',
             '@yahooo.com', '@yaho.com', '@hotmailcom', '@hotmai.com',
             '@outlookcom', '@outlok.com',
-            '@test.com', '@test.test', '@example.com',
+            '@test.test', '@example.com',
             '@asdf.com', '@qwerty.com', '@temp.com'
         ];
 
         if (commonDomainTypos.some(typo => trimmedEmail.includes(typo))) {
+            return false;
+        }
+
+        // Special handling for @test.com - only allow test[number]@test.com pattern
+        if (/@test\.com$/.test(trimmedEmail) && !/^test\d+@test\.com$/.test(trimmedEmail)) {
             return false;
         }
 
@@ -73,11 +78,6 @@ export default function UserForm({ language, onSubmit, isLoading }: UserFormProp
         ];
 
         if (suspiciousPatterns.some(pattern => pattern.test(trimmedEmail))) {
-            return false;
-        }
-
-        // Block test@ emails EXCEPT test[number]@test.com pattern
-        if (/^test@/.test(trimmedEmail) && !/^test\d+@test\.com$/.test(trimmedEmail)) {
             return false;
         }
 
