@@ -1,7 +1,7 @@
 import { Quiz, Question } from '@/types';
 
 // Pool of 73 questions about Olhão
-const questionPool: Question[] = [
+export const questionPool: Question[] = [
     {
         id: 'q1',
         text: {

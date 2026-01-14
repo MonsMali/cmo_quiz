@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Language, UserAnswer } from '@/types';
-import { getQuizById } from '@/data/quizzes';
-import { calculateCorrectAnswers, isAnswerCorrect } from '@/lib/quizLogic';
-import { processPrizeAssignment } from '@/lib/prizeLogic';
+import { calculateCorrectAnswers } from '@/lib/quizLogic';
+import { calculatePrizeTier, applyDailyLimits, assignPrize, getPrizeName } from '@/lib/prizeLogic';
 import { nationalityFromLanguage } from '@/data/translations';
-import { isGoogleSheetsConfigured, checkEmailExists, addSubmission } from '@/lib/googleSheets';
+import { isGoogleSheetsConfigured, checkEmailExists, addSubmission, getTodayPrizeCounts } from '@/lib/googleSheets';
 
 interface SubmitRequestBody {
     name: string;
@@ -35,20 +34,36 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Basic email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        // Comprehensive email validation
+        const trimmedEmail = email.trim().toLowerCase();
+        const emailRegex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+
+        if (!emailRegex.test(trimmedEmail)) {
             return NextResponse.json(
                 { error: 'Invalid email format', code: 'EMAIL_INVALID' },
                 { status: 400 }
             );
         }
 
-        // Get quiz to validate answers
-        const quiz = getQuizById(quizId);
-        if (!quiz) {
+        // Check for suspicious/test emails (but allow test[number]@test.com for testing)
+        const suspiciousPatterns = [
+            /^fake@/, /^asdf@/, /@localhost/,
+            /@test\.test$/, /@example\.com$/,
+            /@asdf\.com$/, /@temp\.com$/
+        ];
+
+        if (suspiciousPatterns.some(pattern => pattern.test(trimmedEmail))) {
             return NextResponse.json(
-                { error: 'Invalid quiz ID', code: 'INVALID_QUIZ' },
+                { error: 'Please use a valid email address', code: 'EMAIL_INVALID' },
+                { status: 400 }
+            );
+        }
+
+        // Block test@ and @test.com EXCEPT test[number]@test.com pattern (for testing)
+        if ((/^test@/.test(trimmedEmail) || /@test\.com$/.test(trimmedEmail)) &&
+            !/^test\d+@test\.com$/.test(trimmedEmail)) {
+            return NextResponse.json(
+                { error: 'Please use a valid email address', code: 'EMAIL_INVALID' },
                 { status: 400 }
             );
         }
@@ -62,19 +77,40 @@ export async function POST(request: NextRequest) {
         }
 
         // Process answers and calculate score
-        const processedAnswers: UserAnswer[] = answers.map((a) => ({
-            questionId: a.questionId,
-            selectedIndex: a.selectedIndex,
-            isCorrect: isAnswerCorrect(quiz, a.questionId, a.selectedIndex),
-        }));
+        // NOTE: We validate answers directly from the submitted data since the quiz is randomly generated
+        // We use the questionId from the answer to look up the correct answer from the question pool
+        const { questionPool } = await import('@/data/quizzes');
+
+        const processedAnswers: UserAnswer[] = answers.map((a) => {
+            const question = questionPool.find((q) => q.id === a.questionId);
+            if (!question) {
+                return {
+                    questionId: a.questionId,
+                    selectedIndex: a.selectedIndex,
+                    isCorrect: false,
+                };
+            }
+            return {
+                questionId: a.questionId,
+                selectedIndex: a.selectedIndex,
+                isCorrect: question.correctIndex === a.selectedIndex,
+            };
+        });
 
         const correctAnswers = calculateCorrectAnswers(processedAnswers);
 
-        // Calculate prize
-        const { prizeTier, prizeId, prizeName } = processPrizeAssignment(
-            correctAnswers,
-            language
-        );
+        // Calculate earned prize tier based on correct answers
+        const earnedTier = calculatePrizeTier(correctAnswers);
+
+        // Get today's prize counts to check daily limits
+        const todayCounts = await getTodayPrizeCounts();
+
+        // Apply daily limits with automatic fallback
+        const finalTier = applyDailyLimits(earnedTier, todayCounts);
+
+        // Assign a random prize from the final tier
+        const prize = assignPrize(finalTier);
+        const prizeName = getPrizeName(prize, language);
 
         // Get IP address (for analytics)
         const forwardedFor = request.headers.get('x-forwarded-for');
@@ -92,8 +128,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({
                 success: true,
                 correctAnswers,
-                prizeTier,
-                prizeId,
+                prizeTier: finalTier,
+                prizeId: prize?.id ?? null,
                 prizeName,
                 demo: true,
             });
@@ -115,8 +151,8 @@ export async function POST(request: NextRequest) {
             quiz_id: quizId,
             questions_answered: processedAnswers,
             correct_answers: correctAnswers,
-            prize_tier: prizeTier,
-            prize_id: prizeId,
+            prize_tier: finalTier,
+            prize_id: prize?.id ?? null,
             prize_awarded: prizeName,
             language,
             ip_address: ipAddress,
@@ -141,8 +177,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             success: true,
             correctAnswers,
-            prizeTier,
-            prizeId,
+            prizeTier: finalTier,
+            prizeId: prize?.id ?? null,
             prizeName,
         });
     } catch (error) {

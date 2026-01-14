@@ -1,100 +1,113 @@
 import { Prize } from '@/types';
 
-// Prize catalog - Update names when actual prizes are determined
+// Prize catalog with daily limits
+// Tier 1 (0-1 correct): Pen - No limit (43/day available)
+// Tier 2 (2 correct): Notebook/Lunch Box - 40/day limit
+// Tier 3 (3 correct): Airplane Bag/Beach Tennis - 15/day limit
+// Tier 4 (4 correct): Special Prize - No automated limit (staff manages)
+
 export const prizes: Prize[] = [
-    // Tier 1 (1 correct answer)
+    // Tier 1 (0-1 correct answer) - Pen
     {
         id: 1,
         tier: 1,
         name: {
-            pt: 'Prémio 1 - Brinde Olhão',
-            es: 'Premio 1 - Regalo Olhão',
-            fr: 'Prix 1 - Cadeau Olhão',
-            de: 'Preis 1 - Olhão Geschenk',
-            en: 'Prize 1 - Olhão Gift',
+            pt: 'Caneta de Olhão',
+            es: 'Bolígrafo de Olhão',
+            fr: 'Stylo d\'Olhão',
+            de: 'Olhão Kugelschreiber',
+            en: 'Olhão Pen',
         },
     },
     {
         id: 2,
         tier: 1,
         name: {
-            pt: 'Prémio 2 - Brinde Olhão',
-            es: 'Premio 2 - Regalo Olhão',
-            fr: 'Prix 2 - Cadeau Olhão',
-            de: 'Preis 2 - Olhão Geschenk',
-            en: 'Prize 2 - Olhão Gift',
+            pt: 'Caneta de Olhão',
+            es: 'Bolígrafo de Olhão',
+            fr: 'Stylo d\'Olhão',
+            de: 'Olhão Kugelschreiber',
+            en: 'Olhão Pen',
         },
     },
-    // Tier 2 (2 correct answers)
+    // Tier 2 (2 correct answers) - Notebook & Lunch Box (40/day limit)
     {
         id: 3,
         tier: 2,
         name: {
-            pt: 'Prémio 3 - Brinde Olhão',
-            es: 'Premio 3 - Regalo Olhão',
-            fr: 'Prix 3 - Cadeau Olhão',
-            de: 'Preis 3 - Olhão Geschenk',
-            en: 'Prize 3 - Olhão Gift',
+            pt: 'Caderno de Olhão',
+            es: 'Cuaderno de Olhão',
+            fr: 'Carnet d\'Olhão',
+            de: 'Olhão Notizbuch',
+            en: 'Olhão Notebook',
         },
     },
     {
         id: 4,
         tier: 2,
         name: {
-            pt: 'Prémio 4 - Brinde Olhão',
-            es: 'Premio 4 - Regalo Olhão',
-            fr: 'Prix 4 - Cadeau Olhão',
-            de: 'Preis 4 - Olhão Geschenk',
-            en: 'Prize 4 - Olhão Gift',
+            pt: 'Lancheira de Olhão',
+            es: 'Fiambrera de Olhão',
+            fr: 'Boîte à lunch d\'Olhão',
+            de: 'Olhão Lunchbox',
+            en: 'Olhão Lunch Box',
         },
     },
-    // Tier 3 (3 correct answers)
+    // Tier 3 (3 correct answers) - Airplane Bag & Beach Tennis (15/day limit)
     {
         id: 5,
         tier: 3,
         name: {
-            pt: 'Prémio 5 - Brinde Olhão',
-            es: 'Premio 5 - Regalo Olhão',
-            fr: 'Prix 5 - Cadeau Olhão',
-            de: 'Preis 5 - Olhão Geschenk',
-            en: 'Prize 5 - Olhão Gift',
+            pt: 'Saco de Viagem de Olhão',
+            es: 'Bolsa de Viaje de Olhão',
+            fr: 'Sac de Voyage d\'Olhão',
+            de: 'Olhão Reisetasche',
+            en: 'Olhão Travel Bag',
         },
     },
     {
         id: 6,
         tier: 3,
         name: {
-            pt: 'Prémio 6 - Brinde Olhão',
-            es: 'Premio 6 - Regalo Olhão',
-            fr: 'Prix 6 - Cadeau Olhão',
-            de: 'Preis 6 - Olhão Geschenk',
-            en: 'Prize 6 - Olhão Gift',
+            pt: 'Raquetes de Ténis de Praia de Olhão',
+            es: 'Raquetas de Tenis de Playa de Olhão',
+            fr: 'Raquettes de Tennis de Plage d\'Olhão',
+            de: 'Olhão Beachtennis-Schläger',
+            en: 'Olhão Beach Tennis Rackets',
         },
     },
-    // Tier 4 (4 correct answers - all correct!)
+    // Tier 4 (4 correct answers - all correct!) - Special Prize (No limit)
     {
         id: 7,
         tier: 4,
         name: {
-            pt: 'Prémio 7 - Brinde Especial Olhão',
-            es: 'Premio 7 - Regalo Especial Olhão',
-            fr: 'Prix 7 - Cadeau Spécial Olhão',
-            de: 'Preis 7 - Olhão Spezialgeschenk',
-            en: 'Prize 7 - Olhão Special Gift',
+            pt: 'Prémio Especial',
+            es: 'Premio Especial',
+            fr: 'Prix Spécial',
+            de: 'Sonderpreis',
+            en: 'Special Prize',
         },
     },
     {
         id: 8,
         tier: 4,
         name: {
-            pt: 'Prémio 8 - Brinde Especial Olhão',
-            es: 'Premio 8 - Regalo Especial Olhão',
-            fr: 'Prix 8 - Cadeau Spécial Olhão',
-            de: 'Preis 8 - Olhão Spezialgeschenk',
-            en: 'Prize 8 - Olhão Special Gift',
+            pt: 'Prémio Especial',
+            es: 'Premio Especial',
+            fr: 'Prix Spécial',
+            de: 'Sonderpreis',
+            en: 'Special Prize',
         },
     },
 ];
+
+// Daily prize limits by tier
+export const DAILY_LIMITS: Record<number, number | null> = {
+    1: null,  // No limit for Tier 1 (pens)
+    2: 40,    // 40 per day for Tier 2 (notebooks/lunch boxes)
+    3: 15,    // 15 per day for Tier 3 (bags/rackets)
+    4: null,  // No automated limit for Tier 4 (special prize - staff manages)
+};
 
 export const getPrizesByTier = (tier: number): Prize[] => {
     return prizes.filter((p) => p.tier === tier);

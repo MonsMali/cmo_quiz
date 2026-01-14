@@ -35,6 +35,7 @@ export default function QuizPage() {
     const [timerKey, setTimerKey] = useState(0); // Used to reset timer
     const [isAnimating, setIsAnimating] = useState(false);
     const [showReview, setShowReview] = useState(false);
+    const [showFeedback, setShowFeedback] = useState(false);
 
     // Load language from localStorage and fetch quiz
     useEffect(() => {
@@ -64,20 +65,11 @@ export default function QuizPage() {
     };
 
     const handleAnswer = useCallback((index: number) => {
-        setSelectedIndex(index);
-    }, []);
+        if (showFeedback) return; // Prevent changing answer during feedback
 
-    const handleTimeUp = useCallback(() => {
-        // If no answer selected when time runs out, select first option (or skip)
-        if (selectedIndex === null && quiz) {
-            // Auto-select a random wrong answer or first option
-            setSelectedIndex(0);
-        }
-        // Auto-advance to next question
-        setTimeout(() => {
-            handleNext();
-        }, 500);
-    }, [selectedIndex, quiz]);
+        setSelectedIndex(index);
+        setShowFeedback(true);
+    }, [showFeedback]);
 
     const handleNext = useCallback(() => {
         if (!quiz) return;
@@ -102,6 +94,7 @@ export default function QuizPage() {
             setTimeout(() => {
                 setCurrentQuestionIndex((prev) => prev + 1);
                 setSelectedIndex(null);
+                setShowFeedback(false); // Reset feedback for next question
                 setTimerKey((prev) => prev + 1); // Reset timer for next question
                 setIsAnimating(false);
                 setState('quiz');
@@ -111,6 +104,29 @@ export default function QuizPage() {
             setState('form');
         }
     }, [selectedIndex, quiz, currentQuestionIndex, answers]);
+
+    // Auto-advance after showing feedback
+    useEffect(() => {
+        if (showFeedback && selectedIndex !== null) {
+            const timer = setTimeout(() => {
+                handleNext();
+            }, 1500);
+
+            return () => clearTimeout(timer);
+        }
+    }, [showFeedback, selectedIndex, handleNext]);
+
+    const handleTimeUp = useCallback(() => {
+        // If no answer selected when time runs out, select first option (or skip)
+        if (selectedIndex === null && quiz) {
+            // Auto-select a random wrong answer or first option
+            setSelectedIndex(0);
+        }
+        // Auto-advance to next question
+        setTimeout(() => {
+            handleNext();
+        }, 500);
+    }, [selectedIndex, quiz, handleNext]);
 
     const handleFormSubmit = async (formData: {
         name: string;
@@ -164,6 +180,7 @@ export default function QuizPage() {
         setSelectedIndex(null);
         setResult(null);
         setShowReview(false);
+        setShowFeedback(false);
         fetchQuiz();
     };
 
@@ -197,7 +214,7 @@ export default function QuizPage() {
                         {/* Header with progress and timer */}
                         <div className="flex items-center justify-between mb-4">
                             <ProgressIndicator
-                                current={currentQuestionIndex + 1}
+                                current={answers.length}
                                 total={quiz.questions.length}
                                 language={language}
                             />
@@ -219,19 +236,22 @@ export default function QuizPage() {
                                 language={language}
                                 selectedIndex={selectedIndex}
                                 onAnswer={handleAnswer}
+                                showFeedback={showFeedback}
                             />
                         </div>
 
-                        {/* Next button */}
-                        <button
-                            onClick={handleNext}
-                            disabled={selectedIndex === null || state === 'transitioning'}
-                            className="btn-primary w-full mt-6"
-                        >
-                            {currentQuestionIndex < quiz.questions.length - 1
-                                ? getTranslation('next', language)
-                                : getTranslation('submit', language)}
-                        </button>
+                        {/* Next button - hidden when showing feedback (auto-advances) */}
+                        {!showFeedback && (
+                            <button
+                                onClick={handleNext}
+                                disabled={selectedIndex === null || state === 'transitioning'}
+                                className="btn-primary w-full mt-6"
+                            >
+                                {currentQuestionIndex < quiz.questions.length - 1
+                                    ? getTranslation('next', language)
+                                    : getTranslation('submit', language)}
+                            </button>
+                        )}
                     </>
                 )}
 

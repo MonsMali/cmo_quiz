@@ -140,12 +140,44 @@ export async function getSubmissions(filters?: {
             stats: data.stats || {
                 totalSubmissions: 0,
                 submissionsByLanguage: { pt: 0, es: 0, fr: 0, de: 0, en: 0 },
-                submissionsByPrizeTier: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 },
+                submissionsByPrizeTier: { 1: 0, 2: 0, 3: 0, 4: 0 },
                 averageCorrectAnswers: 0,
             },
         };
     } catch (error) {
         console.error('Error fetching submissions:', error);
         return null;
+    }
+}
+
+/**
+ * Get today's prize counts by tier for daily limit enforcement
+ */
+export async function getTodayPrizeCounts(): Promise<Record<number, number>> {
+    if (!isGoogleSheetsConfigured()) {
+        // Return empty counts if Google Sheets not configured
+        return { 1: 0, 2: 0, 3: 0, 4: 0 };
+    }
+
+    try {
+        const url = `${GOOGLE_SHEETS_URL}?action=getTodayCounts`;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            console.error('Failed to fetch today\'s counts:', response.status);
+            return { 1: 0, 2: 0, 3: 0, 4: 0 };
+        }
+
+        const data = await response.json();
+        // data.counts should be like { "1": 5, "2": 12, "3": 8, "4": 2 }
+        return data.counts || { 1: 0, 2: 0, 3: 0, 4: 0 };
+    } catch (error) {
+        console.error('Error fetching today\'s prize counts:', error);
+        return { 1: 0, 2: 0, 3: 0, 4: 0 };
     }
 }
