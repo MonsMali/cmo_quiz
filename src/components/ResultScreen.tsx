@@ -1,9 +1,15 @@
 'use client';
 
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { Language } from '@/types';
 import { getTranslation } from '@/data/translations';
-import Confetti from './Confetti';
+
+// BUNDLE OPTIMIZATION: Dynamically import Confetti (only loaded when user wins)
+const Confetti = dynamic(() => import('./Confetti'), {
+    ssr: false,
+    loading: () => null,
+});
 
 interface ResultScreenProps {
     language: Language;

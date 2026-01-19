@@ -4,6 +4,7 @@ import { calculateCorrectAnswers } from '@/lib/quizLogic';
 import { calculatePrizeTier, applyDailyLimits, assignPrize, getPrizeName } from '@/lib/prizeLogic';
 import { nationalityFromLanguage } from '@/data/translations';
 import { isGoogleSheetsConfigured, checkEmailExists, addSubmission, getTodayPrizeCounts } from '@/lib/googleSheets';
+import { getQuestionById } from '@/lib/cache';
 
 interface SubmitRequestBody {
     name: string;
@@ -80,12 +81,10 @@ export async function POST(request: NextRequest) {
         }
 
         // Process answers and calculate score
-        // NOTE: We validate answers directly from the submitted data since the quiz is randomly generated
-        // We use the questionId from the answer to look up the correct answer from the question pool
-        const { questionPool } = await import('@/data/quizzes');
-
+        // CACHING OPTIMIZATION: Use O(1) Map lookup instead of O(n) array find
+        // Uses cached getQuestionById from @/lib/cache for per-request deduplication
         const processedAnswers: UserAnswer[] = answers.map((a) => {
-            const question = questionPool.find((q) => q.id === a.questionId);
+            const question = getQuestionById(a.questionId);
             if (!question) {
                 return {
                     questionId: a.questionId,
@@ -105,17 +104,7 @@ export async function POST(request: NextRequest) {
         // Calculate earned prize tier based on correct answers
         const earnedTier = calculatePrizeTier(correctAnswers);
 
-        // Get today's prize counts to check daily limits
-        const todayCounts = await getTodayPrizeCounts();
-
-        // Apply daily limits with automatic fallback
-        const finalTier = applyDailyLimits(earnedTier, todayCounts);
-
-        // Assign a random prize from the final tier
-        const prize = assignPrize(finalTier);
-        const prizeName = getPrizeName(prize, language);
-
-        // Get IP address (for analytics)
+        // Get IP address (for analytics) - sync operation, do first
         const forwardedFor = request.headers.get('x-forwarded-for');
         const ipAddress = forwardedFor ? forwardedFor.split(',')[0].trim() :
             request.headers.get('x-real-ip') ||
@@ -128,6 +117,10 @@ export async function POST(request: NextRequest) {
         if (!isGoogleSheetsConfigured()) {
             // Development mode - return success without database
             console.log('Google Sheets not configured - running in demo mode');
+            const todayCounts = { 1: 0, 2: 0, 3: 0, 4: 0 };
+            const finalTier = applyDailyLimits(earnedTier, todayCounts);
+            const prize = assignPrize(finalTier);
+            const prizeName = getPrizeName(prize, language);
             return NextResponse.json({
                 success: true,
                 correctAnswers,
@@ -138,14 +131,26 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // Check for duplicate email
-        const emailExists = await checkEmailExists(email.toLowerCase().trim());
+        // WATERFALL OPTIMIZATION: Run independent async operations in parallel
+        const [todayCounts, emailExists] = await Promise.all([
+            getTodayPrizeCounts(),
+            checkEmailExists(email.toLowerCase().trim())
+        ]);
+
+        // Check for duplicate email (using result from parallel fetch)
         if (emailExists) {
             return NextResponse.json(
                 { error: 'Email already participated', code: 'DUPLICATE_EMAIL' },
                 { status: 409 }
             );
         }
+
+        // Apply daily limits with automatic fallback
+        const finalTier = applyDailyLimits(earnedTier, todayCounts);
+
+        // Assign a random prize from the final tier
+        const prize = assignPrize(finalTier);
+        const prizeName = getPrizeName(prize, language);
 
         // Save submission to Google Sheets
         const result = await addSubmission({
