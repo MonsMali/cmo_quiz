@@ -9,35 +9,45 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
-                // Olhão/Algarve coastal theme
+                // Mediterranean warm teal
                 'ocean': {
-                    50: '#f0f9ff',
-                    100: '#e0f2fe',
-                    200: '#bae6fd',
-                    300: '#7dd3fc',
-                    400: '#38bdf8',
-                    500: '#0ea5e9',
-                    600: '#0284c7',
-                    700: '#0369a1',
-                    800: '#075985',
-                    900: '#0c4a6e',
+                    50: '#f0fdfa',
+                    100: '#ccfbf1',
+                    200: '#99f6e4',
+                    300: '#5eead4',
+                    400: '#2dd4bf',
+                    500: '#14b8a6',
+                    600: '#0d9488',
+                    700: '#0f766e',
+                    800: '#115e59',
+                    900: '#134e4a',
                 },
+                // Warm Algarve sand/stone
                 'sand': {
-                    50: '#fefce8',
-                    100: '#fef9c3',
-                    200: '#fef08a',
-                    300: '#fde047',
-                    400: '#facc15',
-                    500: '#eab308',
+                    50: '#fefdf8',
+                    100: '#fdf6e3',
+                    200: '#faecc7',
+                    300: '#f2d99b',
+                    400: '#e4bc6a',
+                    500: '#d4a24a',
                 },
+                // Warm coral for errors
                 'coral': {
-                    400: '#fb7185',
-                    500: '#f43f5e',
-                    600: '#e11d48',
-                }
+                    400: '#e8836a',
+                    500: '#e07a5f',
+                    600: '#c4583e',
+                },
+                // Terracotta accent
+                'terracotta': {
+                    300: '#e8a882',
+                    400: '#d4845a',
+                    500: '#c4704b',
+                    600: '#a85a3a',
+                },
             },
             fontFamily: {
-                sans: ['Inter', 'system-ui', 'sans-serif'],
+                sans: ['DM Sans', 'system-ui', 'sans-serif'],
+                serif: ['DM Serif Display', 'Georgia', 'serif'],
             },
             animation: {
                 'fade-in': 'fadeIn 0.5s ease-out',

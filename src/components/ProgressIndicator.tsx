@@ -21,24 +21,26 @@ export default function ProgressIndicator({
     total,
     language,
 }: ProgressIndicatorProps) {
-    const percentage = (current / total) * 100;
     const label = labels[language] || labels.en;
 
     return (
         <div className="flex-1">
-            <div className="flex justify-between items-center mb-2">
-                <span className="text-ocean-600 font-medium text-sm">
-                    {label.question} {current} {label.of} {total}
-                </span>
-                <span className="text-ocean-400 text-sm font-medium">
-                    {Math.round(percentage)}%
-                </span>
-            </div>
-            <div className="progress-bar">
-                <div
-                    className="progress-bar-fill"
-                    style={{ width: `${percentage}%` }}
-                />
+            <span className="text-ocean-600 font-medium text-sm block mb-2">
+                {label.question} {current} {label.of} {total}
+            </span>
+            <div className="flex items-center gap-2">
+                {Array.from({ length: total }).map((_, i) => {
+                    const step = i + 1;
+                    let dotClass = 'progress-dot';
+                    if (step < current) {
+                        dotClass += ' progress-dot--completed';
+                    } else if (step === current) {
+                        dotClass += ' progress-dot--current';
+                    } else {
+                        dotClass += ' progress-dot--upcoming';
+                    }
+                    return <div key={i} className={dotClass} />;
+                })}
             </div>
         </div>
     );

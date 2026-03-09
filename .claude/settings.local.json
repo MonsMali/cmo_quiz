@@ -9,7 +9,11 @@
       "Bash(wc:*)",
       "WebSearch",
       "WebFetch(domain:vercel.com)",
-      "Bash(npm run test:run:*)"
+      "Bash(npm run test:run:*)",
+      "Read(//home/lvc/.claude/**)",
+      "Read(//home/lvc/.claude/commands/**)",
+      "Bash(npm run:*)",
+      "Bash(npx vitest:*)"
     ],
     "deny": [],
     "ask": []

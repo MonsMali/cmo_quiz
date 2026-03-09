@@ -3,16 +3,16 @@ import 'flag-icons/css/flag-icons.min.css';
 import './globals.css';
 
 export const metadata: Metadata = {
-    title: 'Quiz Olhão - FITUR 2026',
+    title: 'Quiz Olhão - B-Travel Barcelona 2026',
     description: 'Participe no Quiz Olhão e ganhe prémios! Teste os seus conhecimentos sobre Olhão, a Ria Formosa e o Algarve.',
-    keywords: ['Olhão', 'Quiz', 'FITUR', 'Algarve', 'Ria Formosa', 'Portugal', 'Tourism'],
+    keywords: ['Olhão', 'Quiz', 'B-Travel', 'Barcelona', 'Algarve', 'Ria Formosa', 'Portugal', 'Tourism'],
     authors: [{ name: 'Município de Olhão' }],
     icons: {
         icon: '/favicon.png',
         apple: '/apple-touch-icon.png',
     },
     openGraph: {
-        title: 'Quiz Olhão - FITUR 2026',
+        title: 'Quiz Olhão - B-Travel Barcelona 2026',
         description: 'Teste os seus conhecimentos sobre Olhão e ganhe prémios!',
         type: 'website',
         locale: 'pt_PT',
@@ -24,7 +24,8 @@ export const viewport: Viewport = {
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
-    themeColor: '#0ea5e9',
+    themeColor: '#14b8a6',
+    viewportFit: 'cover',
 };
 
 export default function RootLayout({
