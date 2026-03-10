@@ -5,6 +5,7 @@ import { calculatePrizeTier, applyDailyLimits, assignPrize, getPrizeName } from 
 import { nationalityFromLanguage } from '@/data/translations';
 import { isGoogleSheetsConfigured, checkEmailExists, addSubmission, getTodayPrizeCounts } from '@/lib/googleSheets';
 import { getQuestionById } from '@/lib/cache';
+import { isValidEmail } from '@/lib/emailValidation';
 
 interface SubmitRequestBody {
     name: string;
@@ -35,42 +36,21 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Comprehensive email validation
-        const trimmedEmail = email.trim().toLowerCase();
-        const emailRegex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
-
-        if (!emailRegex.test(trimmedEmail)) {
+        // Email validation (shared rules with client)
+        if (!isValidEmail(email)) {
             return NextResponse.json(
-                { error: 'Invalid email format', code: 'EMAIL_INVALID' },
+                { error: 'Invalid email address', code: 'EMAIL_INVALID' },
                 { status: 400 }
             );
         }
 
-        // Check for suspicious/test emails (but allow test[number]@test.com for testing)
-        const suspiciousPatterns = [
-            /^fake@/, /^asdf@/, /@localhost/,
-            /@test\.test$/, /@example\.com$/,
-            /@asdf\.com$/, /@temp\.com$/
-        ];
-
-        if (suspiciousPatterns.some(pattern => pattern.test(trimmedEmail))) {
+        // Validate GDPR consent
+        if (!gdprAccepted) {
             return NextResponse.json(
-                { error: 'Please use a valid email address', code: 'EMAIL_INVALID' },
+                { error: 'GDPR consent is required', code: 'GDPR_REQUIRED' },
                 { status: 400 }
             );
         }
-
-        // Block test@ and @test.com EXCEPT test[number]@test.com pattern (for testing)
-        if ((/^test@/.test(trimmedEmail) || /@test\.com$/.test(trimmedEmail)) &&
-            !/^test\d+@test\.com$/.test(trimmedEmail)) {
-            console.log('Email rejected by test pattern check:', trimmedEmail);
-            return NextResponse.json(
-                { error: 'Please use a valid email address', code: 'EMAIL_INVALID' },
-                { status: 400 }
-            );
-        }
-
-        console.log('Email passed validation:', trimmedEmail);
 
         // Validate answers
         if (!answers || answers.length !== 4) {
@@ -116,7 +96,6 @@ export async function POST(request: NextRequest) {
         // Check if Google Sheets is configured
         if (!isGoogleSheetsConfigured()) {
             // Development mode - return success without database
-            console.log('Google Sheets not configured - running in demo mode');
             const todayCounts = { 1: 0, 2: 0, 3: 0, 4: 0 };
             const finalTier = applyDailyLimits(earnedTier, todayCounts);
             const prize = assignPrize(finalTier);

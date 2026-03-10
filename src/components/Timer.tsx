@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface TimerProps {
     duration: number; // in seconds
@@ -12,34 +12,40 @@ interface TimerProps {
 export default function Timer({ duration, onTimeUp, isActive, resetKey }: TimerProps) {
     const [timeLeft, setTimeLeft] = useState(duration);
     const [tick, setTick] = useState(false);
+    const onTimeUpRef = useRef(onTimeUp);
+
+    // Keep ref current without restarting the interval
+    useEffect(() => {
+        onTimeUpRef.current = onTimeUp;
+    }, [onTimeUp]);
 
     // Reset timer when resetKey changes
     useEffect(() => {
         setTimeLeft(duration);
     }, [resetKey, duration]);
 
-    // Countdown logic
+    // Countdown logic — stable deps, no restarts mid-countdown
     useEffect(() => {
-        if (!isActive || timeLeft <= 0) return;
+        if (!isActive) return;
 
         const interval = setInterval(() => {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
                     clearInterval(interval);
-                    onTimeUp();
+                    onTimeUpRef.current();
                     return 0;
+                }
+                // Trigger tick animation for last 5 seconds
+                if (prev <= 6) {
+                    setTick(true);
+                    setTimeout(() => setTick(false), 300);
                 }
                 return prev - 1;
             });
-            // Trigger tick animation for last 5 seconds
-            if (timeLeft <= 6) {
-                setTick(true);
-                setTimeout(() => setTick(false), 300);
-            }
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [isActive, timeLeft, onTimeUp]);
+    }, [isActive, resetKey]);
 
     // Calculate circle properties
     const radius = 24;
@@ -51,7 +57,7 @@ export default function Timer({ duration, onTimeUp, isActive, resetKey }: TimerP
     const getColor = () => {
         if (timeLeft <= 5) return '#e07a5f';  // coral-500 (warm red)
         if (timeLeft <= 10) return '#e4bc6a'; // sand-400 (amber)
-        return '#14b8a6';                      // ocean-500 (teal)
+        return '#14b0e6';                      // ocean-500 (blue)
     };
 
     const isWarning = timeLeft <= 5;
@@ -66,7 +72,7 @@ export default function Timer({ duration, onTimeUp, isActive, resetKey }: TimerP
                         cx="28"
                         cy="28"
                         r={radius}
-                        stroke="#ccfbf1"
+                        stroke="#e0f2fe"
                         strokeWidth="4"
                         fill="transparent"
                     />

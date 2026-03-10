@@ -3,8 +3,7 @@ import { prizes, getPrizesByTier, DAILY_LIMITS } from '@/data/prizes';
 
 /**
  * Calculate prize tier based on correct answers
- * 0 correct = tier 0 (no prize)
- * 1 correct = tier 1 (pen - prizes 1-2)
+ * 0-1 correct = tier 1 (pen - everyone gets a prize)
  * 2 correct = tier 2 (key holder - prizes 3-4)
  * 3 correct = tier 3 (notepad/necessaire - prizes 5-6)
  * 4 correct = tier 4 (serrated bag/tasting - prizes 7-8)
@@ -13,11 +12,7 @@ export const calculatePrizeTier = (correctAnswers: number): number => {
     if (correctAnswers < 0 || correctAnswers > 4) {
         throw new Error('Correct answers must be between 0 and 4');
     }
-    // 0 correct = no prize
-    if (correctAnswers === 0) return 0;
-    // 1 correct = tier 1
-    if (correctAnswers === 1) return 1;
-    // Otherwise return the number of correct answers as tier
+    if (correctAnswers <= 1) return 1;
     return correctAnswers;
 };
 

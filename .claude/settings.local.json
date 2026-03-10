@@ -14,7 +14,17 @@
       "Read(//home/lvc/.claude/commands/**)",
       "Bash(npm run:*)",
       "Bash(npx vitest:*)",
-      "Bash(cd \"/mnt/c/Users/Luis Conceição/OneDrive - HHS Host Hotel Systems/Desktop/CMO/cmo_quiz-main/logos\" && ls -1b *Visit*)"
+      "Skill(code-review:code-review)",
+      "Bash(gh auth status:*)",
+      "Bash(gh pr list:*)",
+      "Bash(file /mnt/c/CMO_Quiz/logos/Visit*)",
+      "Bash(curl -s http://localhost:3000/_next/static/css/app/layout.css 2>/dev/null | head -200)",
+      "Bash(curl -s \"http://localhost:3000/_next/static/css/app/layout.css?v=1773102835436\" 2>/dev/null | head -200)",
+      "Bash(pkill -f \"next dev\" 2>/dev/null; sleep 2; rm -rf /mnt/c/CMO_Quiz/.next)",
+      "Bash(pkill -f next 2>/dev/null; sleep 1; rm -rf /mnt/c/CMO_Quiz/.next && echo \"cleaned\")",
+      "Bash(fuser -k 3000/tcp 2>/dev/null; sleep 2; echo \"port freed\")",
+      "Bash(npx tailwindcss -c tailwind.config.ts -i src/app/globals.css -o /tmp/tw-test.css --content \"src/**/*.tsx\")",
+      "Read(//tmp/**)"
     ],
     "deny": [],
     "ask": []

@@ -1,16 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { isGoogleSheetsConfigured, getSubmissions } from '@/lib/googleSheets';
-
-// Verify admin session
-async function isAuthenticated(): Promise<boolean> {
-    const cookieStore = await cookies();
-    const session = cookieStore.get('admin_session');
-    const token = cookieStore.get('admin_token');
-
-    if (!session || !token) return false;
-    return session.value === token.value;
-}
+import { isAuthenticated } from '@/lib/adminAuth';
 
 export async function GET(request: NextRequest) {
     try {

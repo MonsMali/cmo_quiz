@@ -184,7 +184,7 @@ export default function AdminPage() {
                         </h1>
                         {isDemo && (
                             <p className="text-sm text-amber-600 mt-1">
-                                ⚠️ Demo Mode - Supabase not configured
+                                ⚠️ Demo Mode - Google Sheets not configured
                             </p>
                         )}
                     </div>

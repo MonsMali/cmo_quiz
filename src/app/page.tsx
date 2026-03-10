@@ -54,18 +54,6 @@ const welcomeMessages: Record<Language, { title: string; subtitle: string }> = {
     },
 };
 
-// Compass/sun divider - evokes navigation and the Algarve sun
-const CompassDivider = () => (
-    <div className="flex items-center justify-center gap-3 my-5">
-        <div className="h-px w-12 bg-gradient-to-r from-transparent to-ocean-300/50" />
-        <svg viewBox="0 0 24 24" className="w-5 h-5 text-ocean-400/60" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="12" cy="12" r="4" />
-            <path d="M12 2v4M12 18v4M2 12h4M18 12h4" strokeLinecap="round" />
-        </svg>
-        <div className="h-px w-12 bg-gradient-to-l from-transparent to-ocean-300/50" />
-    </div>
-);
-
 export default function HomePage() {
     const router = useRouter();
     const [selectedLanguage, setSelectedLanguage] = useState<Language>('es');
@@ -193,16 +181,14 @@ export default function HomePage() {
                         isReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                     }`}
                 >
-                    <h1 className="text-2xl sm:text-3xl font-bold font-serif gradient-text leading-tight">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold gradient-text leading-tight tracking-tight">
                         Quiz do Município de Olhão
                     </h1>
                 </div>
 
-                <CompassDivider />
-
                 {/* Event badge: B-Travel */}
                 <div
-                    className={`inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-ocean-50/80 border border-ocean-200/50 transition-all duration-600 delay-500 ${
+                    className={`mt-5 inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-ocean-50/80 border border-ocean-200/50 transition-all duration-600 delay-500 ${
                         isReady ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
                     }`}
                 >
@@ -233,7 +219,7 @@ export default function HomePage() {
                     </p>
                 </div>
 
-                {/* Start Quiz button - terracotta CTA */}
+                {/* Start Quiz button */}
                 <div
                     className={`mb-8 transition-all duration-600 delay-700 ${
                         isReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'

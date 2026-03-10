@@ -2,21 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Google Fonts - DM Serif Display + DM Sans */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&display=swap');
-
 :root {
-  /* Mediterranean warm teal */
-  --ocean-50: #f0fdfa;
-  --ocean-100: #ccfbf1;
-  --ocean-200: #99f6e4;
-  --ocean-300: #5eead4;
-  --ocean-400: #2dd4bf;
-  --ocean-500: #14b8a6;
-  --ocean-600: #0d9488;
-  --ocean-700: #0f766e;
-  --ocean-800: #115e59;
-  --ocean-900: #134e4a;
+  /* Visit Olhão blue palette - centered on logo color #14b0e6 */
+  --ocean-50: #f0f9ff;
+  --ocean-100: #e0f2fe;
+  --ocean-200: #bae6fd;
+  --ocean-300: #7dd3fc;
+  --ocean-400: #38bdf8;
+  --ocean-500: #14b0e6;
+  --ocean-600: #0d91c4;
+  --ocean-700: #0b749e;
+  --ocean-800: #0e6082;
+  --ocean-900: #11506b;
   /* Warm Algarve sand */
   --sand-100: #fdf6e3;
   --sand-200: #faecc7;
@@ -26,7 +23,7 @@
   --coral-400: #e8836a;
   --coral-500: #e07a5f;
   --coral-600: #c4583e;
-  /* Terracotta accent */
+  /* Terracotta accent (kept for prize decorations) */
   --terracotta-300: #e8a882;
   --terracotta-400: #d4845a;
   --terracotta-500: #c4704b;
@@ -44,8 +41,8 @@ html {
 }
 
 body {
-  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
-  background: linear-gradient(145deg, #fefdf8 0%, #f0fdfb 40%, #e6f5f0 100%);
+  font-family: var(--font-plus-jakarta), system-ui, -apple-system, sans-serif;
+  background: linear-gradient(145deg, #fefeff 0%, #f0f9ff 40%, #e8f4f8 100%);
   min-height: 100vh;
   color: var(--ocean-900);
   -webkit-font-smoothing: antialiased;
@@ -94,12 +91,12 @@ body {
   background-clip: text;
 }
 
-/* Glass effect - warm tinted */
+/* Glass effect - cool tinted */
 .glass {
-  background: rgba(255, 252, 247, 0.82);
+  background: rgba(255, 253, 250, 0.82);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(180, 160, 140, 0.15);
+  border: 1px solid rgba(14, 96, 130, 0.1);
 }
 
 /* Button styles */
@@ -112,16 +109,16 @@ body {
   transition-duration: 100ms;
 }
 
-/* Warm CTA variant for landing page */
+/* CTA variant - matches Visit Olhão logo blue */
 .btn-cta {
   @apply text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.96] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
-  background: linear-gradient(135deg, var(--terracotta-400), var(--terracotta-500));
+  background: linear-gradient(135deg, var(--ocean-500), var(--ocean-600));
   transition: all 200ms ease;
 }
 
 .btn-cta:hover {
-  background: linear-gradient(135deg, var(--terracotta-500), var(--terracotta-600));
-  box-shadow: 0 8px 25px -5px rgba(196, 112, 75, 0.35);
+  background: linear-gradient(135deg, var(--ocean-600), var(--ocean-700));
+  box-shadow: 0 8px 25px -5px rgba(14, 145, 196, 0.35);
 }
 
 .btn-cta:active {
@@ -135,14 +132,18 @@ body {
 
 /* Answer buttons - left border accent */
 .btn-answer {
-  @apply w-full text-left p-4 rounded-xl bg-white/80 hover:bg-ocean-50 hover:shadow-md active:scale-[0.97];
+  @apply w-full text-left p-4 rounded-xl bg-white/80 active:scale-[0.97];
   border: none;
   border-left: 4px solid var(--ocean-200);
   transition: all 200ms ease;
 }
 
-.btn-answer:hover {
-  border-left-color: var(--ocean-400);
+/* Only apply hover styles on devices that support hover (not touch) */
+@media (hover: hover) {
+  .btn-answer:hover {
+    @apply bg-ocean-50 shadow-md;
+    border-left-color: var(--ocean-400);
+  }
 }
 
 .btn-answer.selected {
@@ -157,7 +158,7 @@ body {
 /* Card styles */
 .card {
   @apply glass rounded-2xl p-6 sm:p-8;
-  box-shadow: 0 10px 40px -10px rgba(120, 90, 60, 0.12);
+  box-shadow: 0 10px 40px -10px rgba(14, 96, 130, 0.12);
 }
 
 /* Input styles */
