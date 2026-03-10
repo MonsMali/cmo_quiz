@@ -119,7 +119,7 @@ export default function HomePage() {
                         isReady ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
                     }`}
                 >
-                    <div className="relative" ref={dropdownRef}>
+                    <div className="relative z-50" ref={dropdownRef}>
                         <button
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                             className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/60 hover:bg-white/80 transition-all duration-200 border border-ocean-200/60 shadow-sm hover:shadow-md"
