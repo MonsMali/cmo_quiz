@@ -13,7 +13,8 @@
       "Read(//home/lvc/.claude/**)",
       "Read(//home/lvc/.claude/commands/**)",
       "Bash(npm run:*)",
-      "Bash(npx vitest:*)"
+      "Bash(npx vitest:*)",
+      "Bash(cd \"/mnt/c/Users/Luis Conceição/OneDrive - HHS Host Hotel Systems/Desktop/CMO/cmo_quiz-main/logos\" && ls -1b *Visit*)"
     ],
     "deny": [],
     "ask": []
