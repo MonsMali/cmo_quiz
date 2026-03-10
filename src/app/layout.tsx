@@ -24,6 +24,14 @@ export const metadata: Metadata = {
         description: 'Teste os seus conhecimentos sobre Olhão e ganhe prémios!',
         type: 'website',
         locale: 'pt_PT',
+        images: [
+            {
+                url: '/og-image.png',
+                width: 1080,
+                height: 1080,
+                alt: 'Visit Olhão',
+            },
+        ],
     },
 };
 
