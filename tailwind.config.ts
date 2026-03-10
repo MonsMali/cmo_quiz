@@ -9,18 +9,18 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
-                // Mediterranean warm teal
+                // Visit Olhão blue - centered on logo color #14b0e6
                 'ocean': {
-                    50: '#f0fdfa',
-                    100: '#ccfbf1',
-                    200: '#99f6e4',
-                    300: '#5eead4',
-                    400: '#2dd4bf',
-                    500: '#14b8a6',
-                    600: '#0d9488',
-                    700: '#0f766e',
-                    800: '#115e59',
-                    900: '#134e4a',
+                    50: '#f0f9ff',
+                    100: '#e0f2fe',
+                    200: '#bae6fd',
+                    300: '#7dd3fc',
+                    400: '#38bdf8',
+                    500: '#14b0e6',
+                    600: '#0d91c4',
+                    700: '#0b749e',
+                    800: '#0e6082',
+                    900: '#11506b',
                 },
                 // Warm Algarve sand/stone
                 'sand': {
@@ -37,7 +37,7 @@ const config: Config = {
                     500: '#e07a5f',
                     600: '#c4583e',
                 },
-                // Terracotta accent
+                // Terracotta accent (kept for prize decorations)
                 'terracotta': {
                     300: '#e8a882',
                     400: '#d4845a',
@@ -46,8 +46,7 @@ const config: Config = {
                 },
             },
             fontFamily: {
-                sans: ['DM Sans', 'system-ui', 'sans-serif'],
-                serif: ['DM Serif Display', 'Georgia', 'serif'],
+                sans: ['var(--font-plus-jakarta)', 'system-ui', '-apple-system', 'sans-serif'],
             },
             animation: {
                 'fade-in': 'fadeIn 0.5s ease-out',

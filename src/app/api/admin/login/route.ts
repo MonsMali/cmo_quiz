@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { createSession, destroySession } from '@/lib/adminAuth';
 
 export async function POST(request: NextRequest) {
     try {
@@ -20,27 +20,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Set a simple session cookie (valid for 24 hours)
-        const cookieStore = await cookies();
-        const sessionToken = crypto.randomUUID();
-
-        cookieStore.set('admin_session', sessionToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 60 * 60 * 24, // 24 hours
-            path: '/',
-        });
-
-        // Store the valid session token for verification
-        // In production, use a database or Redis
-        cookieStore.set('admin_token', sessionToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            maxAge: 60 * 60 * 24,
-            path: '/',
-        });
+        await createSession();
 
         return NextResponse.json({ success: true });
     } catch (error) {
@@ -54,9 +34,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE() {
     try {
-        const cookieStore = await cookies();
-        cookieStore.delete('admin_session');
-        cookieStore.delete('admin_token');
+        await destroySession();
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json(

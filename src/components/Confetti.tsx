@@ -34,9 +34,9 @@ export default function Confetti({ trigger }: ConfettiProps) {
 
         // Updated Mediterranean palette
         const colors = [
-            '#14b8a6', // ocean-500 (teal)
-            '#2dd4bf', // ocean-400
-            '#5eead4', // ocean-300
+            '#14b0e6', // ocean-500 (blue)
+            '#38bdf8', // ocean-400
+            '#7dd3fc', // ocean-300
             '#faecc7', // sand-200 (warm gold)
             '#e4bc6a', // sand-400
             '#d4845a', // terracotta-400

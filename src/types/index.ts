@@ -33,26 +33,6 @@ export interface UserAnswer {
     isCorrect: boolean;
 }
 
-export interface SubmissionData {
-    name: string;
-    email: string;
-    quizId: number;
-    questionsAnswered: UserAnswer[];
-    correctAnswers: number;
-    prizeTier: number;
-    prizeId: number | null;
-    prizeAwarded: string | null;
-    language: Language;
-    marketingConsent: boolean;
-}
-
-export interface Submission extends SubmissionData {
-    id: string;
-    timestamp: string;
-    ipAddress: string | null;
-    nationalityInferred: string;
-}
-
 // Prize types
 export interface Prize {
     id: number;
@@ -69,7 +49,6 @@ export interface Prize {
 // API response types
 export interface QuizResponse {
     quiz: Quiz;
-    sessionId: string;
 }
 
 export interface SubmitResponse {

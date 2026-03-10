@@ -91,7 +91,7 @@ const ScoreRing = ({ correct, total }: { correct: number; total: number }) => {
                 />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-bold text-ocean-800 font-serif">
+                <span className="text-2xl font-bold text-ocean-800">
                     {correct}<span className="text-ocean-400 text-lg">/{total}</span>
                 </span>
             </div>
@@ -131,7 +131,7 @@ export default function ResultScreen({
                 </div>
 
                 {/* Congratulations or Thank you */}
-                <h2 className="text-3xl font-bold font-serif gradient-text mb-4">
+                <h2 className="text-3xl font-extrabold gradient-text mb-4 tracking-tight">
                     {hasWon
                         ? getTranslation('congratulations', language)
                         : getTranslation('thankYou', language)}
@@ -155,7 +155,7 @@ export default function ResultScreen({
                         <p className="text-ocean-600 font-medium mb-2">
                             {getTranslation('yourPrize', language)}
                         </p>
-                        <p className="text-2xl font-bold font-serif text-ocean-800">{prizeName}</p>
+                        <p className="text-2xl font-bold text-ocean-800">{prizeName}</p>
                         <div className="mt-4 flex justify-center gap-1.5">
                             {Array.from({ length: prizeTier }).map((_, i) => (
                                 <StarIcon key={i} />

@@ -1,6 +1,14 @@
 import type { Metadata, Viewport } from 'next';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import 'flag-icons/css/flag-icons.min.css';
 import './globals.css';
+
+const plusJakarta = Plus_Jakarta_Sans({
+    subsets: ['latin'],
+    weight: ['300', '400', '500', '600', '700', '800'],
+    variable: '--font-plus-jakarta',
+    display: 'swap',
+});
 
 export const metadata: Metadata = {
     title: 'Quiz Olhão - B-Travel Barcelona 2026',
@@ -24,7 +32,7 @@ export const viewport: Viewport = {
     initialScale: 1,
     maximumScale: 1,
     userScalable: false,
-    themeColor: '#14b8a6',
+    themeColor: '#14b0e6',
     viewportFit: 'cover',
 };
 
@@ -34,7 +42,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="pt">
+        <html lang="pt" className={plusJakarta.variable}>
             <head>
                 <link rel="icon" type="image/png" href="/favicon.png" />
                 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

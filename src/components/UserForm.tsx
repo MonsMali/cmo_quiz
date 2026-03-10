@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Language } from '@/types';
 import { getTranslation } from '@/data/translations';
+import { isValidEmail } from '@/lib/emailValidation';
 
 interface UserFormProps {
     language: Language;
@@ -51,63 +52,6 @@ export default function UserForm({ language, onSubmit, isLoading }: UserFormProp
     const [gdprAccepted, setGdprAccepted] = useState(false);
     const [errors, setErrors] = useState<{ name?: string; email?: string; gdpr?: string }>({});
 
-    const validateEmail = (email: string): boolean => {
-        // Trim and convert to lowercase
-        const trimmedEmail = email.trim().toLowerCase();
-
-        // More comprehensive email regex (RFC 5322 compliant)
-        const emailRegex = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
-
-        if (!emailRegex.test(trimmedEmail)) {
-            return false;
-        }
-
-        // Check for common domain typos
-        const commonDomainTypos = [
-            '@gmailcom', '@gmai.com', '@gmial.com', '@gmaill.com',
-            '@yahooo.com', '@yaho.com', '@hotmailcom', '@hotmai.com',
-            '@outlookcom', '@outlok.com',
-            '@test.test', '@example.com',
-            '@asdf.com', '@qwerty.com', '@temp.com'
-        ];
-
-        if (commonDomainTypos.some(typo => trimmedEmail.includes(typo))) {
-            return false;
-        }
-
-        // Special handling for @test.com - only allow test[number]@test.com pattern
-        if (/@test\.com$/.test(trimmedEmail) && !/^test\d+@test\.com$/.test(trimmedEmail)) {
-            return false;
-        }
-
-        // Check for valid TLD (at least 2 characters)
-        const parts = trimmedEmail.split('@');
-        if (parts.length !== 2) return false;
-
-        const domain = parts[1];
-        const domainParts = domain.split('.');
-        const tld = domainParts[domainParts.length - 1];
-
-        if (tld.length < 2) {
-            return false;
-        }
-
-        // Check for suspicious patterns (but allow test[number]@test.com for testing)
-        const suspiciousPatterns = [
-            /^fake@/,
-            /^asdf@/,
-            /@localhost/,
-            /^admin@/,
-            /^noreply@/,
-        ];
-
-        if (suspiciousPatterns.some(pattern => pattern.test(trimmedEmail))) {
-            return false;
-        }
-
-        return true;
-    };
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -119,7 +63,7 @@ export default function UserForm({ language, onSubmit, isLoading }: UserFormProp
 
         if (!email.trim()) {
             newErrors.email = getTranslation('emailRequired', language);
-        } else if (!validateEmail(email)) {
+        } else if (!isValidEmail(email)) {
             newErrors.email = getTranslation('emailInvalid', language);
         }
 
@@ -138,7 +82,7 @@ export default function UserForm({ language, onSubmit, isLoading }: UserFormProp
 
     return (
         <div className="slide-up">
-            <h2 className="text-2xl font-bold font-serif text-ocean-800 mb-2">
+            <h2 className="text-2xl font-bold text-ocean-800 mb-2">
                 {getTranslation('yourDetails', language)}
             </h2>
             <p className="text-ocean-500 text-sm mb-6">

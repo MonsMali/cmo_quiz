@@ -37,6 +37,15 @@ export default function QuizPage() {
     const [showReview, setShowReview] = useState(false);
     const [showFeedback, setShowFeedback] = useState(false);
     const processingRef = useRef(false); // Prevent duplicate handleNext calls
+    // Refs to always access latest state inside callbacks without stale closures
+    const answersRef = useRef(answers);
+    answersRef.current = answers;
+    const quizRef = useRef(quiz);
+    quizRef.current = quiz;
+    const currentQuestionIndexRef = useRef(currentQuestionIndex);
+    currentQuestionIndexRef.current = currentQuestionIndex;
+    const selectedIndexRef = useRef(selectedIndex);
+    selectedIndexRef.current = selectedIndex;
 
     // Load language from localStorage and fetch quiz
     useEffect(() => {
@@ -66,56 +75,54 @@ export default function QuizPage() {
     };
 
     const handleAnswer = useCallback((index: number) => {
-        if (showFeedback || state !== 'quiz' || processingRef.current) return; // Prevent changing answer during feedback or wrong state
+        if (showFeedback || state !== 'quiz' || processingRef.current) return;
 
         setSelectedIndex(index);
         setShowFeedback(true);
     }, [showFeedback, state]);
 
+    // Uses refs to avoid stale closures — safe to call from any effect/timeout
     const handleNext = useCallback(() => {
-        if (!quiz || processingRef.current) return; // Prevent duplicate calls
+        const currentQuiz = quizRef.current;
+        if (!currentQuiz || processingRef.current) return;
 
-        processingRef.current = true; // Mark as processing
+        processingRef.current = true;
 
-        // Use current selected index or 0 if time ran out
-        const answerIndex = selectedIndex ?? 0;
+        const selected = selectedIndexRef.current;
+        const idx = currentQuestionIndexRef.current;
 
-        const currentQuestion = quiz.questions[currentQuestionIndex];
+        // Record answer: use selected option, or mark as unanswered (-1) on timeout
+        const answerIndex = selected ?? -1;
+
+        const currentQuestion = currentQuiz.questions[idx];
         const newAnswer = {
             questionId: currentQuestion.id,
             selectedIndex: answerIndex,
         };
 
-        const newAnswers = [...answers, newAnswer];
-
-        // Update answers state first
+        const newAnswers = [...answersRef.current, newAnswer];
         setAnswers(newAnswers);
 
-        console.log('handleNext called, currentQuestionIndex:', currentQuestionIndex, 'Total answers after this:', newAnswers.length);
-
-        if (currentQuestionIndex < quiz.questions.length - 1) {
-            // Animate transition
+        if (idx < currentQuiz.questions.length - 1) {
             setIsAnimating(true);
             setState('transitioning');
 
             setTimeout(() => {
                 setCurrentQuestionIndex((prev) => prev + 1);
                 setSelectedIndex(null);
-                setShowFeedback(false); // Reset feedback for next question
-                setTimerKey((prev) => prev + 1); // Reset timer for next question
+                setShowFeedback(false);
+                setTimerKey((prev) => prev + 1);
                 setIsAnimating(false);
                 setState('quiz');
-                processingRef.current = false; // Reset processing flag for next question
+                processingRef.current = false;
             }, 300);
         } else {
-            // All questions answered, wait a tick for state to update before showing form
-            console.log('Last question answered, showing form after state update');
             setTimeout(() => {
                 setState('form');
-                processingRef.current = false; // Reset processing flag
-            }, 50); // Small delay to ensure state has updated
+                processingRef.current = false;
+            }, 50);
         }
-    }, [selectedIndex, quiz, currentQuestionIndex, answers]);
+    }, []); // Stable — reads from refs, no stale closure risk
 
     // Auto-advance after showing feedback
     useEffect(() => {
@@ -126,19 +133,18 @@ export default function QuizPage() {
 
             return () => clearTimeout(timer);
         }
-    }, [showFeedback, selectedIndex, state]); // Remove handleNext from dependencies to prevent infinite loop
+    }, [showFeedback, selectedIndex, state, handleNext]);
 
     const handleTimeUp = useCallback(() => {
-        // If no answer selected when time runs out, select first option (or skip)
-        if (selectedIndex === null && quiz) {
-            // Auto-select a random wrong answer or first option
-            setSelectedIndex(0);
+        if (processingRef.current) return;
+        // Show feedback briefly even on timeout, then advance
+        if (selectedIndexRef.current === null) {
+            setShowFeedback(true);
         }
-        // Auto-advance to next question
         setTimeout(() => {
             handleNext();
         }, 500);
-    }, [selectedIndex, quiz, handleNext]);
+    }, [handleNext]);
 
     const handleFormSubmit = async (formData: {
         name: string;
@@ -147,12 +153,7 @@ export default function QuizPage() {
     }) => {
         if (!quiz) return;
 
-        // Debug: Check how many answers we have before submitting
-        console.log('Submitting with answers:', answers);
-        console.log('Number of answers:', answers.length);
-
         if (answers.length !== 4) {
-            console.error('ERROR: Expected 4 answers but have', answers.length);
             setError(`Internal error: Only ${answers.length} answers recorded. Please try again.`);
             setState('error');
             return;

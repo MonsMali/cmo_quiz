@@ -1,18 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { assignRandomQuiz } from '@/lib/quizLogic';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
-        // Get a random quiz with even distribution
         const quiz = assignRandomQuiz();
 
-        // Generate a session ID for tracking
-        const sessionId = crypto.randomUUID();
-
-        return NextResponse.json({
-            quiz,
-            sessionId,
-        });
+        return NextResponse.json({ quiz });
     } catch (error) {
         console.error('Error getting quiz:', error);
         return NextResponse.json(

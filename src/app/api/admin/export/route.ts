@@ -1,16 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { isGoogleSheetsConfigured, getSubmissions } from '@/lib/googleSheets';
-
-// Verify admin session
-async function isAuthenticated(): Promise<boolean> {
-    const cookieStore = await cookies();
-    const session = cookieStore.get('admin_session');
-    const token = cookieStore.get('admin_token');
-
-    if (!session || !token) return false;
-    return session.value === token.value;
-}
+import { isAuthenticated } from '@/lib/adminAuth';
 
 export async function GET(request: NextRequest) {
     try {
@@ -70,9 +60,13 @@ export async function GET(request: NextRequest) {
         submissions?.forEach((s) => {
             const row = headers.map((header) => {
                 const value = s[header as keyof typeof s];
-                // Escape quotes and wrap in quotes if contains comma
                 if (value === null || value === undefined) return '';
-                const stringValue = String(value);
+                let stringValue = String(value);
+                // Neutralize CSV formula injection
+                if (/^[=+\-@\t\r]/.test(stringValue)) {
+                    stringValue = `'${stringValue}`;
+                }
+                // Escape quotes and wrap in quotes if contains comma
                 if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
                     return `"${stringValue.replace(/"/g, '""')}"`;
                 }
