@@ -200,7 +200,7 @@ export default function ResultScreen({
                 {/* Social media links */}
                 <div className="mt-5 flex items-center justify-center gap-4">
                     <a
-                        href="https://www.facebook.com/p/Visit-Olh%C3%A3o-100057275173920/"
+                        href="https://www.instagram.com/visit.olhao"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-ocean-400 hover:text-ocean-600 transition-colors"
@@ -211,7 +211,7 @@ export default function ResultScreen({
                         </svg>
                     </a>
                     <a
-                        href="https://www.facebook.com/visitolhao"
+                        href="https://www.facebook.com/p/Visit-Olh%C3%A3o-100057275173920/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-ocean-400 hover:text-ocean-600 transition-colors"
