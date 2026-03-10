@@ -115,7 +115,7 @@ export default function HomePage() {
             >
                 {/* Language selector - top right */}
                 <div
-                    className={`flex justify-end mb-6 transition-all duration-500 delay-200 ${
+                    className={`relative z-50 flex justify-end mb-6 transition-all duration-500 delay-200 ${
                         isReady ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
                     }`}
                 >
