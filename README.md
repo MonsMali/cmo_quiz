@@ -1,8 +1,8 @@
-# Quiz Olhao - FITUR 2026
+# Quiz Olhao 
 
-Multilingual quiz website for promotional giveaways at FITUR 2026 trade fair.
+Multilingual quiz website for promotional giveaways at trade fairs.
 
-**Live URL:** [https://quizolhaofitur.vercel.app](https://quizolhaofitur.vercel.app)
+**Live URL:** [https://quizolhao-b-travel.vercel.app](https://quizolhao-b-travel.vercel.app)
 
 ## Features
 
@@ -59,7 +59,7 @@ src/
 
 ## Admin Access
 
-1. Navigate to [https://quizolhaofitur.vercel.app/admin](https://quizolhaofitur.vercel.app/admin)
+1. Navigate to [https://quizolhao-b-travel.vercel.app/admin](https://quizolhao-b-travel.vercel.app/admin)
 2. Enter the admin password
 3. View submissions, filter by language/quiz/tier
 4. Export data to CSV
